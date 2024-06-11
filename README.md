@@ -31,6 +31,10 @@ Retrieve all products with optional query parameters for pagination and field se
   - `limit`: The number of products to return per page.
   - `page`: The page number to fetch.
   - `fields`: A comma-separated list of fields to include in the result.
+  - `category`: The category to filter products by.
+    - `men's clothing`
+    - `women's clothing`
+    - `accessories`
 
 ### 2. Get Product by ID
 
@@ -48,7 +52,7 @@ To use the API, simply make HTTP requests to the provided endpoints with the app
 ### Example
 
 ```http
-GET /products?limit=10&page=1&fields=id,name,price HTTP/1.1
+GET /api/products?limit=10&page=1&fields=id,name,price&category=women's clothing HTTP/1.1
 Host: api.opxpress.sushant.fun
 ```
 
