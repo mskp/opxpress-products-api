@@ -6,12 +6,13 @@ import prisma from "../config/prisma.js";
 import { getPaginatedData } from "../util/index.js";
 
 /**
- * Get all products with optional query parameters for pagination and field selection.
+ * Get all products with optional query parameters for pagination, field selection, and category filtering.
  *
  * @param {ExpressRequest} req - The request object, containing query parameters:
  *   - `limit` {string} - The number of products to return.
  *   - `page` {string} - The page number to fetch.
  *   - `fields` {string} - A comma-separated list of fields to include in the result.
+ *   - `category` {string} - The category to filter products by.
  * @param {ExpressResponse} res - The response object.
  *
  * @returns {Promise<void>} Sends a JSON response with the products or an error message.
@@ -21,7 +22,7 @@ export async function GetAllProducts(
   res: ExpressResponse
 ): Promise<void> {
   try {
-    const { limit, page, fields } = req.query;
+    const { limit, page, fields, category } = req.query;
 
     const limitNumber = limit ? parseInt(limit as string, 10) : 10;
     const pageNumber = page ? parseInt(page as string, 10) : 1;
@@ -34,14 +35,21 @@ export async function GetAllProducts(
         }, {} as any)
       : undefined;
 
-    // Get the total count of products
-    const totalCount = await prisma.product.count();
+    const whereClause = category
+      ? { category: category as string }
+      : undefined;
 
-    // Get the paginated products
+    // Get the total count of products with optional category filtering
+    const totalCount = await prisma.product.count({
+      where: whereClause,
+    });
+
+    // Get the paginated products with optional category filtering
     const products = await prisma.product.findMany({
       take: limitNumber,
       skip: offsetNumber,
       select: selectFields,
+      where: whereClause,
     });
 
     // Prepare the paginated response
